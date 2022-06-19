@@ -28,15 +28,17 @@ function HomePage() {
 
   const runCheck = (id: venue) => {
 
+
     // set the current time
     let now = new Date()
     setTime({ hour: now.getHours(), min: now.getMinutes() })
 
+    isLoading(true)
     fetchLiveData()
     fetchWeekData()
     fetchDayData()
 
-
+    isLoading(false)
 
     setFetched(true)
 
@@ -145,42 +147,54 @@ function HomePage() {
       </div>
       <div className="flex flex-row place-content-between md:self-center md:flex-row md:place-content-between gap-6 ">
 
-        {checkInBox("Check-in innland:",checkin.hour, checkin.min, 1)}
+        {checkInBox("Check-in innland:", checkin.hour, checkin.min, 1)}
 
-        <div className="flex bg-slate-800 rounded-xl shadow-lg h-52 w-52 place-content-center">
-          <p className="absolute text-slate-500 font-semibold mr-16 mt-px">
-            Check-in utland:
-          </p>
-          <h1 className={`font-semibold text-6xl self-center ${getBusyColor(checkinIntl.hour, checkinIntl.min, 0.6)}`}>
-            {checkinIntl.hour}t {Math.floor(checkinIntl.min)}m
-          </h1>
-        </div>
+        {checkInBox("Check-in utland:", checkinIntl.hour, checkinIntl.min, 0.6)}
 
-        <div className="flex bg-slate-800 rounded-xl shadow-lg h-52 w-52 place-content-center">
-          <p className="absolute text-slate-500 font-semibold mr-6 mt-px">
-            Live fotgjenger trafikk
-          </p>
-          <p className="absolute rounded-full animate-ping bg-red-500 font-semibold ml-40 mt-2 w-3 h-3" />
-          <p className="absolute rounded-full bg-red-500 font-semibold ml-40 mt-2 w-3 h-3" />
-          <h1 className={`font-semibold text-6xl self-center ${getBusyColorPercent(busyness)}`}>
-            {busyness}%
-          </h1>
-        </div>
+        {liveTrafficBox("Fotgjenger trafikk:", busyness)}
       </div>
 
       <ChartDayDisplay />
     </div>
 
-    function checkInBox(title:string, hour:number, min:number, percent:number) {
+    function checkInBox(title: string, hour: number, min: number, percent: number) {
       return (
-        <div className="flex bg-slate-800 rounded-xl shadow-lg h-52 w-52 place-content-center">
-          <p className="absolute text-slate-500 font-semibold mr-16 mt-px">
-            {title}
-          </p>
-          <h1 className={`font-semibold drop-shadow-xl text-5xl self-center ${getBusyColor(hour, min, percent)}`}>
-            {hour}t {Math.floor(min)}m
-          </h1>
-        </div>)
+        <div className="bg-slate-800 rounded-xl shadow-lg h-52 w-52">
+          <div className="flex flex-col pl-2 w-fit h-fit">
+            <p className="text-slate-500 font-semibold">
+              {title}
+
+            </p>
+            <h1 className={`flex pt-12 pl-5 font-semibold drop-shadow-xl text-5xl ${getBusyColor(hour, min, percent)}`}>
+              {hour}t {Math.floor(min)}m
+            </h1>
+          </div>
+
+        </div>
+      )
+    }
+
+    function liveTrafficBox(title: string, value: number) {
+      return (
+        <div className="bg-slate-800 rounded-xl shadow-lg h-52 w-52">
+          <div className="flex flex-col pl-2 w-fit h-fit">
+            <div className="flex flex-row">
+              <p className="text-slate-500 font-semibold">
+                {title}
+              </p>
+              <div className="flex ml-2 mb-1">
+                <p className="flex absolute self-end rounded-full animate-ping bg-red-500 font-semibold w-3 h-3" />
+                <p className="flex absolute self-end rounded-full bg-red-500 font-semibold w-3 h-3" />
+              </div>
+            </div>
+
+            <h1 className={`flex pt-12 pl-5 font-semibold drop-shadow-xl text-6xl ${getBusyColorPercent(value)}`}>
+              {value}%
+            </h1>
+          </div>
+
+        </div>
+      )
     }
   }
 
@@ -256,8 +270,8 @@ function HomePage() {
         <div className="flex flex-row min-w-fit self-end gap-3 mb-6">
           {daily.map((num, index) => (
             <div className="flex flex-row">
-              <div key={index} className="flex flex-col place-content-end h-56">
-                <div className="bg-blue-500 rounded-t-md w-4" style={{ height: `${num}%` }} />
+              <div key={index} className="flex flex-col place-content-end self-end h-56">
+                <div className="bg-blue-500 rounded-t-md w-4 self-end" style={{ height: `${num}%` }} />
                 {(index + 6) == time.hour &&
                   <div className=" absolute bg-red-500 rounded-t-md w-4 opacity-60" style={{ height: busyness * 2.3, marginLeft: time.min * 0.475 }} />
                 }
