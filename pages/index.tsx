@@ -270,8 +270,8 @@ function HomePage() {
         <div className="flex flex-row min-w-fit self-end gap-3 mb-6">
           {daily.map((num, index) => (
             <div className="flex flex-row">
-              <div key={index} className="flex flex-col place-content-end self-end h-56">
-                <div className="bg-blue-500 rounded-t-md w-4 self-end" style={{ height: `${num}%` }} />
+              <div key={index} className="flex flex-col place-content-end place-items-end h-56">
+                <div className="bg-blue-500 rounded-t-md w-4" style={{ height: `${num}%` }} />
                 {(index + 6) == time.hour &&
                   <div className=" absolute bg-red-500 rounded-t-md w-4 opacity-60" style={{ height: busyness * 2.3, marginLeft: time.min * 0.475 }} />
                 }
