@@ -40,7 +40,7 @@ function HomePage() {
     fetchWeekData()
     fetchDayData()
 
-
+    calculateCheckIn()
 
     isLoading(false)
     setFetched(true)
@@ -49,15 +49,15 @@ function HomePage() {
 
   useEffect(() => {
     calculateCheckIn()
+  }, [busyness, expected])
 
-  }, [busyness, time])
 
   const calculateCheckIn = () => {
 
-    let min = 20 + (busyness / 2) - (busyness - daily[getTime(time.hour - 6)])
+    let min = 20 + (busyness / 2) - (busyness - expected)
     setCheckin({ hour: Math.floor(min / 60), min: min % 60 })
 
-    let minInt = 60 + (busyness) - (busyness - daily[getTime(time.hour - 6)])
+    let minInt = 60 + (busyness) - (busyness - expected)
     setCheckinIntl({ hour: Math.floor(minInt / 60), min: minInt % 60 })
 
 
