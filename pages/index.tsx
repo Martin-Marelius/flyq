@@ -57,7 +57,7 @@ function HomePage() {
     let min = 20 + (busyness / 2) - (busyness - expected)
     setCheckin({ hour: Math.floor(min / 60), min: min % 60 })
 
-    let minInt = 60 + (busyness) - (busyness - expected)
+    let minInt = 50 + (busyness) - (busyness - expected)
     setCheckinIntl({ hour: Math.floor(minInt / 60), min: minInt % 60 })
 
 
@@ -72,7 +72,7 @@ function HomePage() {
     }
 
     await axios.request(options).then((response) => {
-      setBusyness(response.data['analysis']['venue_live_busyness'])
+      setBusyness((response.data['analysis']['venue_live_busyness'] + response.data['analysis']['venue_forecasted_busyness']) / 2)
       setExpected(response.data['analysis']['venue_forecasted_busyness'])
     })
 
