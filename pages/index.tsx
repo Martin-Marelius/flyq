@@ -373,15 +373,13 @@ function HomePage() {
                   }
                 }}
               >
-                <div key={index} className="flex flex-col place-items-end items-end place-content-end h-56">
-                  <div className="bg-blue-500 rounded-t-md w-4" style={{ height: `${num}%` }} />
+                <div key={index} className="flex flex-col-reverse h-56">
+                  <div className="bg-blue-500 rounded-t-md w-4 z-40" style={{ height: `${num}%` }} />
                   {(index + 6) == time.hour &&
-                    <div className=" absolute bg-red-500 rounded-t-md w-4 opacity-60" style={{ height: busyness * 2.3, marginLeft: time.min * 0.475 }} />
+                    <div className=" absolute z-50 bg-red-500 rounded-t-md w-4 opacity-60" style={{ height: busyness * 2.3, marginLeft: time.min * 0.475 }} />
                   }
 
-
-
-                  <div className="self-end">
+                  <div className="self-end absolute">
                     <h2 className="absolute text-slate-400 font-semibold">
                       {index % 3 == 0 &&
                         getTime(index + 7) + ':00'}
