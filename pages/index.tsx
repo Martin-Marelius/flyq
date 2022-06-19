@@ -23,6 +23,7 @@ function HomePage() {
   const [weekly, setWeekly] = useState([])
   const [daily, setDaily] = useState([])
 
+  const [loading, isLoading] = useState(false)
   const [fetched, setFetched] = useState(false)
 
   const runCheck = (id: venue) => {
@@ -101,15 +102,14 @@ function HomePage() {
   }
 
   return (
-    <html>
+    <html lang="no">
       <head>
-        <meta charSet="utf-8" />
+        <meta />
         <title>flykø.no</title>
       </head>
 
-      <body>
-
-        <div className="flex flex-col h-screen w-screen bg-slate-900">
+      <body className="h-screen bg-slate-900">
+        <div className="flex flex-col absolute">
 
           {logoDisplay()}
 
@@ -128,9 +128,7 @@ function HomePage() {
             </div>
           </div>
 
-          {fetched &&
-            statsDisplay()
-          }
+          {statsDisplay()}
 
         </div >
       </body>
@@ -138,30 +136,23 @@ function HomePage() {
   )
 
   function statsDisplay(): React.ReactNode {
-    return <div className="flex flex-col h-min-screen w-full bg-slate-900 mt-12 gap-6 md:self-center">
+    return <div className={`flex flex-col px-4 bg-slate-900 mt-12 gap-6 md:self-center ${fetched ? "" : "hidden"}`}>
 
       <div className="flex flex-row self-center mb-6">
         <h2 className="text-xl gap-2 font-medium flex font-sans text-slate-600">
           Et estimat for check-in tid på <p className="font-bold">Gardermoen Lufthavn</p>
         </h2>
       </div>
-      <div className="flex flex-row self-start md:self-center md:flex-row md:place-content-between gap-6 ">
+      <div className="flex flex-row place-content-between md:self-center md:flex-row md:place-content-between gap-6 ">
 
-        <div className="flex bg-slate-800 rounded-xl shadow-lg h-52 w-52 place-content-center">
-          <p className="absolute text-slate-500 font-semibold mr-16 mt-px">
-            Check-in innland:
-          </p>
-          <h1 className={`font-semibold drop-shadow-xl text-5xl self-center ${getBusyColor(checkin.hour + ((checkin.min * 1.66666667) * 0.01))}`}>
-            {checkin.hour}t {checkin.min}m
-          </h1>
-        </div>
+        {checkInBox("Check-in innland:",checkin.hour, checkin.min, 1)}
 
         <div className="flex bg-slate-800 rounded-xl shadow-lg h-52 w-52 place-content-center">
           <p className="absolute text-slate-500 font-semibold mr-16 mt-px">
             Check-in utland:
           </p>
-          <h1 className={`font-semibold text-6xl self-center ${getBusyColor(checkinIntl.hour + ((checkinIntl.min * 1.66666667) * 0.005))}`}>
-            {checkinIntl.hour}t {checkinIntl.min}m
+          <h1 className={`font-semibold text-6xl self-center ${getBusyColor(checkinIntl.hour, checkinIntl.min, 0.6)}`}>
+            {checkinIntl.hour}t {Math.floor(checkinIntl.min)}m
           </h1>
         </div>
 
@@ -171,7 +162,7 @@ function HomePage() {
           </p>
           <p className="absolute rounded-full animate-ping bg-red-500 font-semibold ml-40 mt-2 w-3 h-3" />
           <p className="absolute rounded-full bg-red-500 font-semibold ml-40 mt-2 w-3 h-3" />
-          <h1 className={`font-semibold text-6xl self-center ${getBusyColor(busyness / 25)}`}>
+          <h1 className={`font-semibold text-6xl self-center ${getBusyColorPercent(busyness)}`}>
             {busyness}%
           </h1>
         </div>
@@ -179,22 +170,56 @@ function HomePage() {
 
       <ChartDayDisplay />
     </div>
+
+    function checkInBox(title:string, hour:number, min:number, percent:number) {
+      return (
+        <div className="flex bg-slate-800 rounded-xl shadow-lg h-52 w-52 place-content-center">
+          <p className="absolute text-slate-500 font-semibold mr-16 mt-px">
+            {title}
+          </p>
+          <h1 className={`font-semibold drop-shadow-xl text-5xl self-center ${getBusyColor(hour, min, percent)}`}>
+            {hour}t {Math.floor(min)}m
+          </h1>
+        </div>)
+    }
   }
 
-  function getBusyColor(value: number) {
-    if (value <= 1.8) {
+  function getBusyColorPercent(value: number) {
+    if (value <= 50) {
       return "text-green-500"
     }
-    if (value <= 2.4) {
+    if (value <= 65) {
       return "text-yellow-500"
     }
-    if (value <= 3) {
+    if (value <= 75) {
       return "text-orange-500"
     }
-    if (value <= 4) {
+    if (value <= 90) {
       return "text-red-500"
     }
-    if (value > 4) {
+    if (value <= 100) {
+      return "text-red-800"
+    }
+    else {
+      return "text-green-500"
+    }
+  }
+
+  function getBusyColor(hour: number, min: number, weighted: number) {
+    let value = ((hour * 60) + min) * weighted
+    if (value <= 60) {
+      return "text-green-500"
+    }
+    if (value <= 90) {
+      return "text-yellow-500"
+    }
+    if (value <= 120) {
+      return "text-orange-500"
+    }
+    if (value <= 180) {
+      return "text-red-500"
+    }
+    if (value > 240) {
       return "text-red-800"
     }
     else {
@@ -233,10 +258,10 @@ function HomePage() {
             <div className="flex flex-row">
               <div key={index} className="flex flex-col place-content-end h-56">
                 <div className="bg-blue-500 rounded-t-md w-4" style={{ height: `${num}%` }} />
-                  {(index+6) == time.hour &&
-                    <div className=" absolute bg-red-500 rounded-t-md w-4 opacity-60" style={{ height: busyness * 2.3, marginLeft: time.min * 0.475 }} />
-                  }
-                
+                {(index + 6) == time.hour &&
+                  <div className=" absolute bg-red-500 rounded-t-md w-4 opacity-60" style={{ height: busyness * 2.3, marginLeft: time.min * 0.475 }} />
+                }
+
               </div>
 
               <div className="self-end">
@@ -317,7 +342,7 @@ function HomePage() {
   }
 
   function infoTitle() {
-    return <div className="flex self-center mt-20">
+    return <div className="flex self-center mt-24 px-4">
       <h2 className="text-xl font-medium font-sans self-center text-center text-slate-700">
         Se hvor lang check-in tid det er på flyplassen du skal på.
       </h2>
@@ -325,7 +350,7 @@ function HomePage() {
   }
 
   function logoDisplay() {
-    return <div className="flex p-6 self-start select-none">
+    return <div className="flex p-6 self-start select-none absolute">
       <Link href="/">
         <h1 className="flex text-5xl text-slate-200 font-sans cursor-pointer" onClick={() => setFetched(false)}>
 
