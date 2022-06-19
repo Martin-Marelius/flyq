@@ -1,6 +1,7 @@
 import Link from "next/link"
 import React, { Children, useEffect, useState } from "react"
 import axios from "axios"
+import { AnimatePresence, motion } from "framer-motion"
 
 import venues from "../utils/venues"
 import { venue } from "../utils/venues"
@@ -26,20 +27,22 @@ function HomePage() {
   const [loading, isLoading] = useState(false)
   const [fetched, setFetched] = useState(false)
 
-  const runCheck = (id: venue) => {
-
+  const runCheck = async (id: venue) => {
+    if (fetched) return
 
     // set the current time
     let now = new Date()
     setTime({ hour: now.getHours(), min: now.getMinutes() })
 
     isLoading(true)
+
     fetchLiveData()
     fetchWeekData()
     fetchDayData()
 
-    isLoading(false)
 
+
+    isLoading(false)
     setFetched(true)
 
   }
@@ -51,10 +54,10 @@ function HomePage() {
 
   const calculateCheckIn = () => {
 
-    let min = 20 + (busyness / 2)
+    let min = 20 + (busyness / 2) - (busyness - daily[getTime(time.hour - 6)])
     setCheckin({ hour: Math.floor(min / 60), min: min % 60 })
 
-    let minInt = 60 + (busyness)
+    let minInt = 60 + (busyness) - (busyness - daily[getTime(time.hour - 6)])
     setCheckinIntl({ hour: Math.floor(minInt / 60), min: minInt % 60 })
 
 
@@ -111,13 +114,13 @@ function HomePage() {
       </head>
 
       <body className="h-screen bg-slate-900">
-        <div className="flex flex-col absolute">
+        <div className="flex flex-col absolute md:relative md:items-center">
 
           {logoDisplay()}
 
           <div className="h-px bg-slate-800" id="line" />
 
-          <div className="flex flex-col self-center gap-6">
+          <div className="flex flex-col gap-6">
 
             {infoTitle()}
             {mainTitle()}
@@ -130,7 +133,25 @@ function HomePage() {
             </div>
           </div>
 
-          {statsDisplay()}
+          {fetched &&
+            <motion.div initial="hidden" animate="visible" variants={{
+              hidden: {
+                y: 40,
+                scale: 0.9,
+                opacity: 0
+              },
+              visible: {
+                y: 0,
+                scale: 1,
+                opacity: 1,
+                transition: {
+                  delay: 0.4
+                }
+              }
+            }}>
+              {statsDisplay()}
+            </motion.div>
+          }
 
         </div >
       </body>
@@ -138,23 +159,86 @@ function HomePage() {
   )
 
   function statsDisplay(): React.ReactNode {
-    return <div className={`flex flex-col px-4 bg-slate-900 mt-12 gap-6 md:self-center ${fetched ? "" : "hidden"}`}>
+    return <div className={`flex flex-col px-4 bg-slate-900 mt-12 gap-6 ${fetched ? "" : "hidden"}`}>
 
       <div className="flex flex-row self-center mb-6">
         <h2 className="text-xl gap-2 font-medium flex font-sans text-slate-600">
           Et estimat for check-in tid på <p className="font-bold">Gardermoen Lufthavn</p>
         </h2>
       </div>
-      <div className="flex flex-row place-content-between md:self-center md:flex-row md:place-content-between gap-6 ">
+      <div className="flex flex-row place-content-between md:flex-row gap-6 ">
 
-        {checkInBox("Check-in innland:", checkin.hour, checkin.min, 1)}
+        <motion.div initial="hidden" animate="visible" variants={{
+          hidden: {
+            y: 40,
+            scale: 0.9,
+            opacity: 0
+          },
+          visible: {
+            y: 0,
+            scale: 1,
+            opacity: 1,
+            transition: {
+              delay: 0.3
+            }
+          }
+        }}>
+          {checkInBox("Check-in innland:", checkin.hour, checkin.min, 1)}
+        </motion.div>
 
-        {checkInBox("Check-in utland:", checkinIntl.hour, checkinIntl.min, 0.6)}
-
-        {liveTrafficBox("Fotgjenger trafikk:", busyness)}
+        <motion.div initial="hidden" animate="visible" variants={{
+          hidden: {
+            y: 40,
+            scale: 0.9,
+            opacity: 0
+          },
+          visible: {
+            y: 0,
+            scale: 1,
+            opacity: 1,
+            transition: {
+              delay: 0.38
+            }
+          }
+        }}>
+          {checkInBox("Check-in utland:", checkinIntl.hour, checkinIntl.min, 0.6)}
+        </motion.div>
+        <motion.div initial="hidden" animate="visible" variants={{
+          hidden: {
+            y: 40,
+            scale: 0.9,
+            opacity: 0
+          },
+          visible: {
+            y: 0,
+            scale: 1,
+            opacity: 1,
+            transition: {
+              delay: 0.45
+            }
+          }
+        }}>
+          {liveTrafficBox("Fotgjenger trafikk:", busyness)}
+        </motion.div>
       </div>
 
-      <ChartDayDisplay />
+      <motion.div initial="hidden" animate="visible" variants={{
+        hidden: {
+          y: 40,
+          scale: 0.9,
+          opacity: 0
+        },
+        visible: {
+          y: 0,
+          scale: 1,
+          opacity: 1,
+          transition: {
+            delay: 0.46
+          }
+        }
+      }}>
+        <ChartDayDisplay />
+      </motion.div>
     </div>
 
     function checkInBox(title: string, hour: number, min: number, percent: number) {
@@ -267,27 +351,48 @@ function HomePage() {
 
     return (
       <div className="flex flex-row max-w-fit self-center p-2 px-4 shadow-lg rounded-xl bg-slate-800 max-h-fit place-items-center mb-24">
-        <div className="flex flex-row min-w-fit self-end gap-3 mb-6">
-          {daily.map((num, index) => (
-            <div className="flex flex-row">
-              <div key={index} className="flex flex-col place-content-end h-56">
-                <div className="bg-blue-500 rounded-t-md w-4 justify-self-end place-content-end" style={{ height: `${num}%` }} />
-                {(index + 6) == time.hour &&
-                  <div className=" absolute bg-red-500 rounded-t-md w-4 opacity-60" style={{ height: busyness * 2.3, marginLeft: time.min * 0.475 }} />
-                }
+        <div className="flex flex-row min-w-fit gap-3 mb-6">
+          <AnimatePresence>
 
-              </div>
+            {daily.map((num, index) => (
+              <motion.div
+                key={index}
+                initial="hidden" animate="visible" variants={{
+                  hidden: {
 
-              <div className="self-end">
-                <h2 className="absolute text-slate-400 font-semibold">
-                  {index % 3 == 0 &&
-                    getTime(index + 7) + ':00'}
+                    scale: 0.9,
+                    opacity: 0
+                  },
+                  visible: {
 
-                </h2>
-              </div>
+                    scale: 1,
+                    opacity: 1,
+                    transition: {
+                      delay: 0.5 + (0.014 * index)
+                    }
+                  }
+                }}
+              >
+                <div key={index} className="flex flex-col place-items-end items-end place-content-end h-56">
+                  <div className="bg-blue-500 rounded-t-md w-4" style={{ height: `${num}%` }} />
+                  {(index + 6) == time.hour &&
+                    <div className=" absolute bg-red-500 rounded-t-md w-4 opacity-60" style={{ height: busyness * 2.3, marginLeft: time.min * 0.475 }} />
+                  }
 
-            </div>)
-          )}
+
+
+                  <div className="self-end">
+                    <h2 className="absolute text-slate-400 font-semibold">
+                      {index % 3 == 0 &&
+                        getTime(index + 7) + ':00'}
+
+                    </h2>
+                  </div>
+
+                </div>
+              </motion.div>
+            ))}
+          </AnimatePresence>
 
         </div>
       </div>
