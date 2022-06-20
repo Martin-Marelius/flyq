@@ -20,6 +20,10 @@ function HomePage() {
   const [checkin, setCheckin] = useState({ hour: 0, min: 0 })
   const [checkinIntl, setCheckinIntl] = useState({ hour: 0, min: 0 })
 
+  // daily flights and airport size
+  const [flights, setFlights] = useState(0)
+  const [airportSize, setAirportSize] = useState(0)
+
   // displayed data weekly
   const [weekly, setWeekly] = useState([])
   const [daily, setDaily] = useState([])
@@ -36,31 +40,56 @@ function HomePage() {
 
     isLoading(true)
 
-    fetchLiveData()
-    fetchWeekData()
-    fetchDayData()
+    await fetchLiveData()
+    await fetchWeekData()
+    await fetchDayData()
+    await flightsData()
+    await fetchAirportSize()
 
     calculateCheckIn()
 
     isLoading(false)
-    setFetched(true)
 
+    setFetched(true)
   }
 
   useEffect(() => {
     calculateCheckIn()
-  }, [busyness, expected])
+  }, [fetched])
 
 
   const calculateCheckIn = () => {
 
-    let min = 20 + (busyness / 2) - (busyness - expected)
+    let min = (30 + (busyness / 2) - (busyness - expected)) * (1 + (flights / airportSize))
     setCheckin({ hour: Math.floor(min / 60), min: min % 60 })
 
-    let minInt = 50 + (busyness) - (busyness - expected)
+    let minInt = (50 + (busyness) - (busyness - expected)) * (1 + (flights / airportSize))
     setCheckinIntl({ hour: Math.floor(minInt / 60), min: minInt % 60 })
+  }
 
+  async function flightsData() {
+    const options = {
+      method: "GET",
+      url: "https://flightqdb.herokuapp.com/incoming_departures"
+    }
 
+    await axios.request(options).then((response) => {
+      let size = Object.keys(response.data['airport']['flights']['flight']).length
+      setFlights(size)
+    })
+
+  }
+
+  async function fetchAirportSize() {
+    const options = {
+      method: "GET",
+      url: "https://flightqdb.herokuapp.com/airport_size"
+    }
+
+    await axios.request(options).then((response) => {
+      let size = Object.keys(response.data['airport']['flights']['flight']).length
+      setAirportSize(size)
+    })
 
   }
 
@@ -132,6 +161,44 @@ function HomePage() {
 
             </div>
           </div>
+          <AnimatePresence>
+            {(loading || fetched) &&
+              <motion.div initial="hidden" animate="visible" variants={{
+                hidden: {
+                  y: 20,
+                  scale: 0.8,
+                  opacity: 0
+                },
+                visible: {
+                  y: 0,
+                  scale: 1,
+                  opacity: 1,
+                  transition: {
+                    delay: 0.2
+                  }
+                }
+              }}>
+                <div className="flex flex-col w-min-screen place-items-center mt-12">
+                  <h2 className="flex text-xl gap-2 font-medium font-sans text-slate-600">
+                    Et estimat for check-in tid på <p className=" flex font-bold">Gardermoen Lufthavn</p>
+                  </h2>
+                </div>
+              </motion.div>}
+          </AnimatePresence>
+
+
+          <AnimatePresence>
+            {loading &&
+              <motion.div exit={{
+                opacity: 0, transition: {
+                  delay: 0.2
+                }
+              }}>
+                {shadowBoxes()}
+              </motion.div>
+            }
+          </AnimatePresence>
+
 
           {fetched &&
             <motion.div initial="hidden" animate="visible" variants={{
@@ -155,17 +222,39 @@ function HomePage() {
 
         </div >
       </body>
-    </html>
+    </html >
   )
+
+  function shadowBoxes() {
+    return (
+      <div className="flex flex-col px-4 bg-slate-900 mt-12 gap-6 animate-pulse">
+        <div className="flex flex-row place-content-between md:flex-row gap-6 ">
+          <div className="bg-slate-800 rounded-xl shadow-lg h-52 w-52">
+            <div className="flex flex-col pl-2 w-fit h-fit">
+            </div>
+          </div>
+          <div className="bg-slate-800 rounded-xl shadow-lg h-52 w-52">
+            <div className="flex flex-col pl-2 w-fit h-fit">
+            </div>
+          </div>
+          <div className="bg-slate-800 rounded-xl shadow-lg h-52 w-52">
+            <div className="flex flex-col pl-2 w-fit h-fit">
+            </div>
+          </div>
+        </div>
+
+        <div className="flex w-full h-64 rounded-lg bg-slate-800">
+
+        </div>
+
+      </div>
+    )
+  }
 
   function statsDisplay(): React.ReactNode {
     return <div className={`flex flex-col px-4 bg-slate-900 mt-12 gap-6 ${fetched ? "" : "hidden"}`}>
 
-      <div className="flex flex-row self-center mb-6">
-        <h2 className="text-xl gap-2 font-medium flex font-sans text-slate-600">
-          Et estimat for check-in tid på <p className="font-bold">Gardermoen Lufthavn</p>
-        </h2>
-      </div>
+
       <div className="flex flex-row place-content-between md:flex-row gap-6 ">
 
         <motion.div initial="hidden" animate="visible" variants={{
