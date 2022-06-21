@@ -6,6 +6,9 @@ import { AnimatePresence, motion } from "framer-motion"
 import venues from "../utils/venues"
 import { venue } from "../utils/venues"
 
+import Footer from "../components/footer/Footer"
+import Header from "../components/header/Header"
+
 
 function HomePage() {
 
@@ -142,13 +145,11 @@ function HomePage() {
         <title>flykø.no</title>
       </head>
 
-      <body className="h-screen bg-slate-900">
+      <body className="h-min-screen bg-slate-900">
         <div className="flex flex-col absolute md:relative md:items-center">
 
-          {logoDisplay()}
-
-          <div className="h-px bg-slate-800" id="line" />
-
+          <Header onClick={() => setFetched(false)}/>
+          
           <div className="flex flex-col gap-6">
 
             {infoTitle()}
@@ -219,8 +220,9 @@ function HomePage() {
               {statsDisplay()}
             </motion.div>
           }
-
+          <Footer />
         </div >
+
       </body>
     </html >
   )
@@ -482,6 +484,7 @@ function HomePage() {
           </AnimatePresence>
 
         </div>
+
       </div>
 
     )
