@@ -25,7 +25,7 @@ const Information = () => {
             </h1>
 
             <p className="whitespace-pre-wrap font-normal text-slate-500 text-lg">
-                Flykø.no er en nettside som viser deg hvor travel en flyplass er i nåtid.
+                Flykø.no er en nettside som viser deg hvor travel en flyplass er i sanntid.
 
             </p>
 

@@ -28,7 +28,7 @@ const Information = () => {
                 Ta kontakt
             </h1>
 
-            <ContactForm />
+            
             
             <h2 className="text-slate-500 self-center font-semibold text-2xl">
                 Links:
