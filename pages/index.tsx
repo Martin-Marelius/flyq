@@ -559,7 +559,7 @@ function HomePage() {
             </h2>
           </div>
         </button>
-        <ul className="peer-focus:flex z-50 hover:flex hidden absolute flex-col mt-2 rounded-xl shadow-lg p-2 bg-slate-800 place-content-center">
+        <ul className="peer-focus:flex peer-active:flex peer- z-50 hover:flex hidden absolute flex-col mt-2 rounded-xl shadow-lg p-2 bg-slate-800 place-content-center">
           {allVenues.map((ven) => (
             <button onClick={() => (setSelectedVenue(ven), setFetched(false))}>
               <div className="flex mt-2  bg-slate-800 rounded-full p-1 hover:bg-slate-700 active:scale-105 transition-all">
