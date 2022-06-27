@@ -267,7 +267,7 @@ function HomePage() {
               }}>
                 <div className="flex flex-col w-min-screen place-items-center mt-12">
                   <h2 className="flex text-xl gap-2 font-medium font-sans text-slate-600">
-                    Et estimat for check-in tid på <p className=" flex font-bold">{selectedVenue.name}</p>
+                    Et estimat for oppmøtetider på <p className=" flex font-bold">{selectedVenue.name}</p>
                   </h2>
                 </div>
               </motion.div>}
@@ -559,7 +559,7 @@ function HomePage() {
             </h2>
           </div>
         </button>
-        <ul className="peer-focus:flex peer-active:flex peer- z-50 hover:flex hidden absolute flex-col mt-2 rounded-xl shadow-lg p-2 bg-slate-800 place-content-center">
+        <ul className="peer-focus:flex peer-active:flex z-50 hover:flex hidden absolute flex-col mt-2 rounded-xl shadow-lg p-2 bg-slate-800 place-content-center">
           {allVenues.map((ven) => (
             <button onClick={() => (setSelectedVenue(ven), setFetched(false))}>
               <div className="flex mt-2  bg-slate-800 rounded-full p-1 hover:bg-slate-700 active:scale-105 transition-all">
@@ -585,7 +585,7 @@ function HomePage() {
   function infoTitle() {
     return <div className="flex self-center mt-24 px-4">
       <h2 className="text-xl font-medium font-sans self-center text-center text-slate-700">
-        Se hvor lang check-in tid det er på flyplassen du skal på.
+        Se hvor tidlig du bør møte opp på din favoritt flyplass!
       </h2>
     </div>
   }
