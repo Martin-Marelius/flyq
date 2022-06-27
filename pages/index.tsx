@@ -550,7 +550,7 @@ function HomePage() {
   function searchAirport() {
     return (
       <div>
-        <button className="flex peer focus:peer active:peer active:scale-105 transition-all">
+        <button className="flex peer active:scale-105 transition-all">
           <div className="flex rounded-full shadow-lg p-4 bg-slate-800 place-content-center hover:bg-slate-700 transition-all">
 
             <svg className="h-6 w-6 text-slate-200" width="24" height="24" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" fill="none" strokeLinecap="round" strokeLinejoin="round">  <path stroke="none" d="M0 0h24v24H0z" />  <path d="M15 12h5a2 2 0 0 1 0 4h-15l-3 -6h3l2 2h3l-2 -7h3z" transform="rotate(-15 12 12) translate(0 -1)" />  <line x1="3" y1="21" x2="21" y2="21" /></svg>
@@ -559,7 +559,7 @@ function HomePage() {
             </h2>
           </div>
         </button>
-        <ul className="peer-focus:flex peer-active:flex z-50 hover:flex hidden absolute flex-col mt-2 rounded-xl shadow-lg p-2 bg-slate-800 place-content-center">
+        <ul className="peer-focus:flex peer-active:flex peer-focus-within:flex peer-focus-visible:flex  z-50 hover:flex hidden absolute flex-col mt-2 rounded-xl shadow-lg p-2 bg-slate-800 place-content-center">
           {allVenues.map((ven) => (
             <button onClick={() => (setSelectedVenue(ven), setFetched(false))}>
               <div className="flex mt-2  bg-slate-800 rounded-full p-1 hover:bg-slate-700 active:scale-105 transition-all">
