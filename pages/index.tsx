@@ -337,6 +337,10 @@ function HomePage() {
 
         </div>
 
+        <div className="flex w-full h-64 rounded-lg bg-slate-800">
+
+        </div>
+
       </div>
     )
   }
@@ -486,10 +490,13 @@ function HomePage() {
 
     return (
       <>
-        <div className="my-2">
-          <h1 className="text-2xl text-slate-500 font-semibold">
+        <div className="flex flex-row place-content-between">
+          <h1 className="text-2xl my-2 text-slate-500 font-semibold">
             Fly avganger:
           </h1>
+          <a href="https://www.avinor.no" className="text-sm text-slate-600 font-semibold pt-6 mr-2 hover:underline">
+            Flydata fra Avinor
+          </a>
         </div>
 
         <div className="flex flex-row max-w-fit self-center p-2 px-4 shadow-lg rounded-xl bg-slate-800 max-h-fit place-items-center ">
