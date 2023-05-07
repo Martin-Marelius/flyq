@@ -61,44 +61,17 @@ function HomePage() {
 
     const options = {
       method: "GET",
-      url: `https://flightqdb.herokuapp.com/venue_information/${selectedVenue.tag}`,
-      params: {
-        id: selectedVenue.id,
-        tag: selectedVenue.tag,
-        venue_name: selectedVenue.venue_name,
-        venue_address: selectedVenue.venue_address
-      }
+      url: `http://flyq-backend-env.eba-p8gd6gib.eu-north-1.elasticbeanstalk.com/api/Airport?airport=${selectedVenue.tag}`,
     }
 
     await axios.request(options).then((response) => {
       console.log(response.data)
-
-      if (response.data['busyness']['data']['analysis']['venue_live_busyness_available'] == true) {
-        setBusyness(response.data['busyness']['data']['analysis']['venue_live_busyness'])
-      }
-      else {
-        setBusyness(response.data['busyness']['data']['analysis']['venue_forecasted_busyness'])
-      }
-
-      setExpected(response.data['busyness']['data']['analysis']['venue_forecasted_busyness'])
-      setDaily(response.data['dailyChart']['data']['analysis']['day_raw'])
-
-      if ((response.data['flights']['data']['airport']['flights']['flight']) == null) {
-        setFlights(0)
-      }
-      else {
-        let flights = Object.keys(response.data['flights']['data']['airport']['flights']['flight']).length
-        setFlights(flights)
-      }
-
-      if ((response.data['airportSize']['data']['airport']['flights']['flight']) == null) {
-        setFlights(0)
-      }
-      else {
-        let airportSize = Object.keys(response.data['airportSize']['data']['airport']['flights']['flight']).length
-        setAirportSize(airportSize)
-        setAllFlights(response.data['airportSize']['data']['airport']['flights']['flight'])
-      }
+      
+      setBusyness(response.data['LiveForecast'])
+      setDaily(response.data['DayRaw'])
+      setFlights(response.data['FlightsNext'])
+      setAirportSize(response.data['Flights'])
+      setAllFlights(response.data['ScheduleTimes'])
     })
   }
 
@@ -123,7 +96,7 @@ function HomePage() {
               }
             }
           }}>
-            <CheckInBox title="Check-in innland:" hour={Math.floor((30 + (busyness / 2) + ((busyness - expected) / 2)) * (1 + (flights / airportSize)) / 60)} min={(30 + (busyness / 2) + ((busyness - expected) / 2)) * (1 + (flights / airportSize)) % 60} percent={1} />
+            <CheckInBox title="Oppmøte innland:" hour={Math.floor((30 + (busyness / 2) + ((busyness - expected) / 2)) * (1 + (flights / airportSize)) / 60)} min={(30 + (busyness / 2) + ((busyness - expected) / 2)) * (1 + (flights / airportSize)) % 60} percent={1} />
           </motion.div>
 
           <motion.div initial="hidden" animate="visible" variants={{
@@ -141,7 +114,7 @@ function HomePage() {
               }
             }
           }}>
-            <CheckInBox title="Check-in utland:" hour={Math.floor((50 + (busyness) + ((busyness - expected) / 2)) * (1 + (flights / airportSize)) / 60)} min={(50 + (busyness) + ((busyness - expected) / 2)) * (1 + (flights / airportSize)) % 60} percent={0.6} />
+            <CheckInBox title="Oppmøte utland:" hour={Math.floor((50 + (busyness) + ((busyness - expected) / 2)) * (1 + (flights / airportSize)) / 60)} min={(50 + (busyness) + ((busyness - expected) / 2)) * (1 + (flights / airportSize)) % 60} percent={0.6} />
 
           </motion.div>
           <motion.div initial="hidden" animate="visible" variants={{
@@ -230,7 +203,7 @@ function HomePage() {
     <html lang="no">
       <head>
         <meta />
-        <title>flykø.no</title>
+        <title>flyq.no</title>
       </head>
 
       <body className="h-min-screen bg-slate-900">
@@ -368,19 +341,19 @@ function HomePage() {
 
   function getBusyColor(hour: number, min: number, weighted: number) {
     let value = ((hour * 60) + min) * weighted
-    if (value <= 60) {
+    if (value <= 90) {
       return "text-green-500"
     }
-    if (value <= 90) {
+    if (value <= 120) {
       return "text-yellow-500"
     }
-    if (value <= 120) {
+    if (value <= 180) {
       return "text-orange-500"
     }
-    if (value <= 180) {
+    if (value <= 240) {
       return "text-red-500"
     }
-    if (value > 240) {
+    if (value > 300) {
       return "text-red-800"
     }
     else {
@@ -395,7 +368,7 @@ function HomePage() {
       <>
         <div className="my-2">
           <h1 className="text-2xl text-slate-500 font-semibold">
-            Fot trafikk:
+            Forventet fotgjenger trafikk:
           </h1>
         </div>
 
@@ -455,7 +428,8 @@ function HomePage() {
 
     return newDateObj;
   }
-  // returns number of flights which departs at the passed in date 
+
+  // returns number of flights which departs at the passed in hour 
   function getFlightsAtHour(hour) {
     let num = 0
     let today = new Date()
@@ -465,7 +439,7 @@ function HomePage() {
     allFlights.map((flight, index) => {
 
       // create the second date, in CET time
-      let date2 = new Date(flight.schedule_time._text)
+      let date2 = new Date(flight)
 
       // if difference is less than 1 hour, add to num
       if ((date2.getTime() - date1.getTime()) / (1000 * 60 * 60) >= 0 && (date2.getTime() - date1.getTime()) / (1000 * 60 * 60) <= 1) {
@@ -477,22 +451,32 @@ function HomePage() {
     return num
   }
 
+  function getFlightsAtHour2(hour) {
+    let date = new Date();
+    let targetTime = new Date(date.setHours(date.getHours() - hour))
+
+    const timeRangeInMilliseconds = 30 * 60 * 1000; // 30 minutes in milliseconds
+
+    const filteredDatesArray = allFlights.filter(date => Math.abs(new Date(date).getTime() - targetTime.getTime()) <= timeRangeInMilliseconds);
+    return filteredDatesArray.length;
+  }
+
   function FlightsDisplay() {
     let today = new Date()
 
     let flightData = []
 
     daily.map((value, index) => {
-      flightData[index] = getFlightsAtHour((-today.getHours()) + index)
+      flightData[index] = getFlightsAtHour2(-today.getHours() + index)
     })
-
+    console.log(flightData)
     let maxFlights = Math.max(...flightData)
 
     return (
       <>
         <div className="flex flex-row place-content-between">
           <h1 className="text-2xl my-2 text-slate-500 font-semibold">
-            Fly avganger:
+            Fly avganger de neste timene:
           </h1>
           <a href="https://www.avinor.no" className="text-sm text-slate-600 font-semibold pt-6 mr-2 hover:underline">
             Flydata fra Avinor

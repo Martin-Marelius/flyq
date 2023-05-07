@@ -25,7 +25,7 @@ const Information = () => {
             </h1>
 
             <p className="whitespace-pre-wrap font-normal text-slate-500 text-lg">
-                Flykø.no er en nettside som viser deg hvor travel en flyplass er i sanntid.
+                Flyq.no er en nettside som viser deg hvor travel en flyplass er i sanntid.
 
             </p>
 
@@ -35,7 +35,7 @@ const Information = () => {
 
             <p className="whitespace-pre-wrap font-normal text-slate-500 text-lg">
                 <span className="font-semibold">NB!</span> Alltid dra i god tid til flyplassen, spesielt i den travle tiden mellom 12:00-16:00.
-                Flykø.no står ikke ansvarlig om du under noen omstendigheter skulle komme forseint til flyet ditt.
+                Flyq.no står ikke ansvarlig om du under noen omstendigheter skulle komme forseint til flyet ditt.
             </p>
         </div>
     )
