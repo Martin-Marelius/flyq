@@ -61,7 +61,7 @@ function HomePage() {
 
     const options = {
       method: "GET",
-      url: `http://flyq-backend-env.eba-p8gd6gib.eu-north-1.elasticbeanstalk.com/api/Airport?airport=${selectedVenue.tag}`,
+      url: `https://api.flyq.no/api/Airport?airport=${selectedVenue.tag}`,
     }
 
     await axios.request(options).then((response) => {

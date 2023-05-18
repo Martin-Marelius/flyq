@@ -17,7 +17,7 @@ const Footer = () => {
                     </li>
                 </ul>
             </div>
-            <span className="block text-sm mb-4 text-center text-slate-500">© 2022 <a className="hover:underline">flykø</a> - Martin Marelius
+            <span className="block text-sm mb-4 text-center text-slate-500">© 2022 <a className="hover:underline">flyq</a> - Martin Marelius
             </span>
 
 
